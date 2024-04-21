@@ -65,7 +65,7 @@ export default function SignUp() {
               ></TextInput>
             </div>
             <div className="">
-              <Label value="Your emai"></Label>
+              <Label value="Your email"></Label>
               <TextInput
                 type="text"
                 placeholder="name@company.com"
