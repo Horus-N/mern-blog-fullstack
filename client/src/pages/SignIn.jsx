@@ -4,6 +4,7 @@ import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { signInFailure,signInStart,signInSuccess } from "../redux/user/userSlice";
 import {useDispatch,useSelector} from 'react-redux';
 import * as request from '../service/axios'
+import { OAuth } from "../components";
 
 
 
@@ -12,10 +13,6 @@ export default function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {loading,error:errorMessage}=useSelector(state=>state.user);
-
-console.log(loading);
-console.log(errorMessage);
-  console.log(formData);
   const handleChange = e=>{
     setFormData({...formData,[e.target.id]:e.target.value.trim()})
   }
@@ -89,6 +86,8 @@ console.log(errorMessage);
                 ):'Sign In'
               }
             </Button>
+
+            <OAuth/>
           </form>
 
           <div className="flex gap-2 text-sm mt-5">
