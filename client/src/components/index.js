@@ -1,2 +1,3 @@
 import Header from "./Header";
-export {Header}
+import FooterCom from "./FooterCom";
+export {Header,FooterCom}
