@@ -25,13 +25,13 @@ const signup = async(req,res,next)=>{
 }
 
 const signin = async(req,res)=>{
-  const {username,password} = req.body;
+  const {email,password} = req.body;
 
-  if(!username||!password){
+  if(!email||!password){
     next(errorHandler(400,"Tất cả các trường không được để trống!"))
   }
 
-  const findOne = await User.findOne({username});
+  const findOne = await User.findOne({email});
   if(!findOne){
     return res.json({
       success:false,
@@ -42,9 +42,12 @@ const signin = async(req,res)=>{
     const checkPassword = await bcryptjs.compare(req.body.password, findOne.password);
 
     if(checkPassword){
+      const users = {...findOne._doc};
+      delete users.password;
       return res.json({
         success:true,
-        message:'Đăng nhập thành công!'
+        message:'Đăng nhập thành công!',
+        user:users
       })
     }else{
       return res.json({
