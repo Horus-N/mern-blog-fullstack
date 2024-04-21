@@ -1,13 +1,12 @@
 const bcryptjs = require('bcryptjs');
-const User = require('../models/user.model')
+const User = require('../models/user.model');
+const { errorHandler } = require('../utils/error');
 
-const signup = async(req,res)=>{
+const signup = async(req,res,next)=>{
     const {username,email, password} = req.body;
 
     if(!username||!email||!password){
-        return res.status(400).json({
-            message:"Các trường không được để trống!"
-        })
+       next(errorHandler(400,"Tất cả các trường không được để trống!"))
     }
     const hashedPassword = bcryptjs.hashSync(password,10);
 
@@ -16,7 +15,7 @@ const signup = async(req,res)=>{
     await newUSer.save();
     return res.json({message:'Đăng kí tai khoan thanh cong!'})
   } catch (error) {
-    res.status(500).json({error})
+    next(error);
   }
 }
 
