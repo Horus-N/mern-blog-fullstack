@@ -2,13 +2,10 @@ const { errorHandler } = require("../utils/error.js");
 const bcryptjs = require('bcryptjs')
 const User= require('../models/user.model')
 
-const test = (req, res) => {
-  res.send("hello");
-};
 
 const updateUser = async (req, res, next) => {
 
-  if (req.user.id !== req.params.userId) {
+  if (req.user.id !== req.userId) {
     return next(errorHandler(403, "You are not allowed to update this user"));
   }
   if (req.body.password) {
@@ -19,21 +16,27 @@ const updateUser = async (req, res, next) => {
   }
 
   if(req.body.username){
-  
-
+        const respon= (resStatus,message)=>{
+               return res.status(resStatus).json({
+                message
+                })
+        }
+       
         if(req.body.username.length<7||req.body.username.length>20){
-                return next(errorHandler(400,'Username must be between 7 and 20 characters'));
+                // return res.status(401).json({mes:'Username must be between 7 and 20 characters'})
+                return respon(401,'Username must be between 7 and 20 characters');
         }
         if(req.body.username.includes(' ')){
-                return next(errorHandler(400,'Username cannot contain spaces'));
+                return respon(401,'Username cannot contain spaces');
         }
         if(req.body.username !==req.body.username.toLowerCase()){
-                return next(errorHandler(400,'Username must be lowercase'));
+                return respon(401,'Username must be lowercase');
         }
         if(!req.body.username.match(/^[a-zA-Z0-9]+$/)){
-                return next(errorHandler(400,"Username can only contain letters and numbers"));
+                return respon(401,"Username can only contain letters and numbers");
         }
         try {           
+                // console.log(req.userId);
                 const updateUser= await User.findByIdAndUpdate(req.userId,{
                         $set:{
                              username:req.body.username,
@@ -42,13 +45,12 @@ const updateUser = async (req, res, next) => {
                              password:req.body.password,
                         }
                 },{new:true});
-                console.log(updateUser);
                 const {password,...rest} =updateUser._doc;
-                res.status(200).json(rest)
+                respon(200,rest);
         } catch (error) {
                 next(error)
         }
   }
 };
 
-module.exports = { test, updateUser };
+module.exports = { updateUser };

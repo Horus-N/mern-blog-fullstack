@@ -1,6 +1,5 @@
 import { Alert, Button, TextInput } from "flowbite-react";
 import React, { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
 import {
   getDownloadURL,
   ref,
@@ -10,6 +9,13 @@ import {
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import {
+  updateFailure,
+  updateStart,
+  updateSuccess,
+} from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import * as request from "../service/axios";
 
 function DashProfile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -18,8 +24,10 @@ function DashProfile() {
   const filePickerRef = useRef();
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
+  const [formData, setFormData] = useState({});
+  const ditpatch = useDispatch();
+  console.log(currentUser);
 
-  console.log(imageFileUploadError, imageFileUploadProgress);
   useEffect(() => {
     return () => {
       URL.revokeObjectURL(imageFileUrl);
@@ -69,20 +77,54 @@ function DashProfile() {
         );
         setImageFileUploadProgress(null);
         setImageFile(null);
-        setImageFileUrl(null)
+        setImageFileUrl(null);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageFileUrl(downloadURL);
+          setFormData({ ...formData, profilePicture: downloadURL });
         });
       }
     );
   };
 
+  const handleOnchange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+  console.log(formData);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (Object.keys(formData).length === 0) {
+      return;
+    }
+    try {
+      ditpatch(updateStart());
+      const res = await request.put(
+        `http://localhost:5000/api/user/update/${currentUser._id}`,
+        formData,
+        currentUser.token
+      );
+      console.log(res.data.message);
+      if (res.status === 401) {
+      console.log(res.data.message);
+
+        ditpatch(updateFailure(res.data.message));
+      }else{
+        ditpatch(updateSuccess(res.message));
+      }
+    } catch (error) {
+      console.log('1');
+      ditpatch(updateFailure(error.message));
+
+    }
+  };
   return (
     <div className="max-w-lg max-auto mx-auto p-3 w-full ">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
-      <form action="" className="flex flex-col gap-4">
+      <form action="" onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="file"
           name="file"
@@ -122,7 +164,11 @@ function DashProfile() {
             src={imageFileUrl || currentUser.profilePicture}
             alt="user"
             className={`rounded-full w-full h-full 
-            border-8 border-[lightgray] object-cover ${imageFileUploadProgress && imageFileUploadProgress<100 && 'opacity-60'}`}
+            border-8 border-[lightgray] object-cover ${
+              imageFileUploadProgress &&
+              imageFileUploadProgress < 100 &&
+              "opacity-60"
+            }`}
           />
         </div>
         {imageFileUploadError && <Alert color="failure">{}</Alert>}
@@ -131,15 +177,22 @@ function DashProfile() {
           id="username"
           placeholder="username"
           defaultValue={currentUser.username}
+          onChange={handleOnchange}
         />
         <TextInput
           type="email"
           id="email"
           placeholder="email"
           defaultValue={currentUser.email}
+          onChange={handleOnchange}
         />
 
-        <TextInput type="password" id="password" placeholder="password" />
+        <TextInput
+          type="password"
+          id="password"
+          placeholder="password"
+          onChange={handleOnchange}
+        />
 
         <Button type="submit" gradientDuoTone="purpleToBlue" outline>
           Update

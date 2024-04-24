@@ -1,16 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const cors = require('cors');
 const userRouter = require("./routes/user.route");
 const authRouter = require("./routes/auth.route");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
+const { errorHandler } = require("./utils/error");
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.use(cookieParser());
 dotenv.config();
@@ -20,13 +21,13 @@ mongoose.connect(process.env.MONGO).then(() => console.log("Connected!"));
 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
-app.use((err,req,res,next)=>{
-  const statusCode = err.statusCode||500;
-  const message = err.message||'Internal Server Error';
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
   res.status(statusCode).json({
-    success:false,
+    success: false,
     statusCode,
-    message
+    message,
   });
 });
 
