@@ -5,11 +5,14 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const userRouter = require("./routes/user.route");
 const authRouter = require("./routes/auth.route");
+const cookieParser = require('cookie-parser');
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+
+app.use(cookieParser());
 dotenv.config();
 
 mongoose.set("strictQuery", true);
