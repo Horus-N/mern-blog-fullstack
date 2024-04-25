@@ -24,9 +24,14 @@ function DashProfile() {
   const filePickerRef = useRef();
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
+  const [imageFileUploading,setImageFileUploading] = useState(null);
   const [formData, setFormData] = useState({});
+  const [updateUserSuccess,setUpdateUserSuccess] = useState(null)
+  const [updateUserError,setUpdateUserError] = useState(null);
   const ditpatch = useDispatch();
   console.log(currentUser);
+
+  console.log(formData);
 
   useEffect(() => {
     return () => {
@@ -36,6 +41,7 @@ function DashProfile() {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    console.log(file);
     if (file) {
       setImageFile(file);
       setImageFileUrl(URL.createObjectURL(file));
@@ -59,6 +65,8 @@ function DashProfile() {
     //       }
     //     }
     //   }
+    setImageFileUploading(true)
+    setImageFileUploadError(null);
     const storage = getStorage(app);
     const fileName = new Date().getTime() + imageFile.name;
     const storageRef = ref(storage, fileName);
@@ -78,11 +86,13 @@ function DashProfile() {
         setImageFileUploadProgress(null);
         setImageFile(null);
         setImageFileUrl(null);
+        setImageFileUploading(false)
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageFileUrl(downloadURL);
           setFormData({ ...formData, profilePicture: downloadURL });
+          setImageFileUploading(false);
         });
       }
     );
@@ -94,10 +104,16 @@ function DashProfile() {
       [e.target.id]: e.target.value,
     });
   };
-  console.log(formData);
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setUpdateUserError(null);
+    setUpdateUserSuccess(null);
     if (Object.keys(formData).length === 0) {
+      setUpdateUserError('NO changes make');
+      return;
+    }
+    if(imageFileUploading){
+      setUpdateUserError('please wait for image to upload');
       return;
     }
     try {
@@ -107,17 +123,16 @@ function DashProfile() {
         formData,
         currentUser.token
       );
-      console.log(res.data.message);
       if (res.status === 401) {
-      console.log(res.data.message);
-
-        ditpatch(updateFailure(res.data.message));
+        ditpatch(updateFailure(res.data.message)); 
+        setUpdateUserError(res.data.message);
       }else{
-        ditpatch(updateSuccess(res.message));
+        ditpatch(updateSuccess({...res.message.user,token:res.message.token,refreshToken:res.message.refreshToken}));
+        setUpdateUserSuccess("User's profile updated successfully");
       }
     } catch (error) {
-      console.log('1');
       ditpatch(updateFailure(error.message));
+      setUpdateUserError(error.message);
 
     }
   };
@@ -202,6 +217,20 @@ function DashProfile() {
         <span className="cursor-pointer">Delete Account</span>
         <span className="cursor-pointer">Sign Out</span>
       </div>
+
+      {
+        updateUserSuccess &&(
+          <Alert color='success' className="mt-5">
+            {updateUserSuccess}
+          </Alert>
+        )
+      }
+
+      {updateUserError &&(
+          <Alert color='failure' className="mt-5">
+          {updateUserError}
+        </Alert>
+      )}
     </div>
   );
 }

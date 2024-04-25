@@ -46,9 +46,11 @@ const signin = async (req, res) => {
     if (checkPassword) {
       const users = { ...findOne._doc };
       const token = jwt.sign({ id: findOne._id }, process.env.JWT_SECRET,{expiresIn: '1d'});
+      const refreshToken = jwt.sign({ id: findOne._id }, process.env.JWT_SECRET,{expiresIn: '1y'});
       delete users.password;
       return res.status(200).cookie("access_token", token).json({
         token:token,
+        refreshToken:refreshToken,
         success: true,
         message: "Đăng nhập thành công!",
         user: users,

@@ -27,7 +27,7 @@ export default function SignIn() {
       if(res.success===false){
         return dispatch(signInFailure(res.message));
       }
-      dispatch(signInSuccess({...res.user,token:res.token}))
+      dispatch(signInSuccess({...res.user,token:res.token,refreshToken:res.refreshToken}))
       navigate('/');
      
     } catch (error) {

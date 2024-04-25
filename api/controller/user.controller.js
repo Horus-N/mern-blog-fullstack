@@ -1,10 +1,10 @@
 const { errorHandler } = require("../utils/error.js");
 const bcryptjs = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 const User= require('../models/user.model')
 
 
 const updateUser = async (req, res, next) => {
-
   if (req.user.id !== req.userId) {
     return next(errorHandler(403, "You are not allowed to update this user"));
   }
@@ -13,6 +13,14 @@ const updateUser = async (req, res, next) => {
         return next(errorHandler(400,'Password must be at least 6 characters'));
     }
    req.body.password=bcryptjs.hashSync(req.body.password,10);
+  }
+  if(req.body.email){
+        const user = await User.findOne({email:req.body.email});
+        if(user){
+                return res.status(401).json({
+                        message:'Email already exists !'
+                })
+        }
   }
 
   if(req.body.username){
@@ -45,8 +53,10 @@ const updateUser = async (req, res, next) => {
                              password:req.body.password,
                         }
                 },{new:true});
-                const {password,...rest} =updateUser._doc;
-                respon(200,rest);
+                const token = jwt.sign({ id: updateUser._id }, process.env.JWT_SECRET,{expiresIn: '1d'});
+                const refreshToken = jwt.sign({ id: updateUser._id }, process.env.JWT_SECRET,{expiresIn: '1y'});
+                const {password,...user} =updateUser._doc;
+                respon(200,{user,token,refreshToken});
         } catch (error) {
                 next(error)
         }
