@@ -24,10 +24,20 @@ export const put = async (url, data, token) => {
   };
   try {
     const res = await request.put(url, data, config);
-    console.log(res);
     return res.data;
   } catch (error) {
-    console.log(error);
+    return error.response
+  }
+};
+
+export const deleteUser = async (url, data=null, token) => {
+  const config = {
+    headers: { Authorization: `bearer ${token}` },
+  };
+  try {
+    const res = await request.delete(url, data, config);
+    return res.data;
+  } catch (error) {
     return error.response
   }
 };
