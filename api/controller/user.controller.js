@@ -63,4 +63,26 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-module.exports = { updateUser };
+const deleteUser =async (req,res,next)=>{
+        if(req.user.id !== req.userId){
+                console.log('hello');
+                return next (errorHandler(403,'your are not allowed to delete this user'));
+        }
+        try {
+                const user = await User.findById(req.userId);
+                if(user){
+                        await User.findByIdAndDelete(req.userId);
+                        return res.status(200).json({message:'User has been deleted'});
+                }else{
+                        return res.status(404).json({
+                                success: false,
+                                message: 'This user does not exist!'
+                        })
+                }
+              
+        } catch (error) {
+                next(error)
+        }
+}
+
+module.exports = { updateUser,deleteUser };
