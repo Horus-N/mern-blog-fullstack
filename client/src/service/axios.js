@@ -41,3 +41,17 @@ export const deleteUser = async (url, data=null, token) => {
     return error.response
   }
 };
+
+
+
+export const signout = async (url, data=null, token) => {
+  const config = {
+    headers: { Authorization: `bearer ${token}` },
+  };
+  try {
+    const res = await request.post(url, data, config);
+    return res.data;
+  } catch (error) {
+    return error.response
+  }
+};

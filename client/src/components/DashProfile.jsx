@@ -16,13 +16,14 @@ import {
   deleteUserFailure,
   deleteUserStart,
   deleteUserSuccess,
+  signoutSuccess
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import * as request from "../service/axios";
 
 function DashProfile() {
-  const { currentUser,error } = useSelector((state) => state.user);
+  const { currentUser, error } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const filePickerRef = useRef();
@@ -156,13 +157,31 @@ function DashProfile() {
         null,
         currentUser.token
       );
-      if(res.success===false){
-        dispatch(deleteUserFailure(res.message))
-      }else{
+      if (res.success === false) {
+        dispatch(deleteUserFailure(res.message));
+      } else {
         dispatch(deleteUserSuccess());
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
+    }
+  };
+
+  const handleSignout = async () => {
+    try {
+      const res = await request.signout(
+        `http://localhost:5000/api/user/delete/${
+          (currentUser._id, null, currentUser.token)
+        }`
+      );
+
+      if (res.success === false) {
+        console.log(res.message);
+      } else {
+        dispatch(signoutSuccess());
+      }
+    } catch (error) {
+      console.log(error.message);
     }
   };
   return (
@@ -246,7 +265,9 @@ function DashProfile() {
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
           Delete Account
         </span>
-        <span className="cursor-pointer">Sign Out</span>
+        <span onClick={handleSignout} className="cursor-pointer">
+          Sign Out
+        </span>
       </div>
 
       {updateUserSuccess && (
@@ -260,7 +281,7 @@ function DashProfile() {
           {updateUserError}
         </Alert>
       )}
-       {error && (
+      {error && (
         <Alert color="failure" className="mt-5">
           {error}
         </Alert>
