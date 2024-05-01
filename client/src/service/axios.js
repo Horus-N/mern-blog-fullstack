@@ -4,8 +4,14 @@ const request = axios.create({
   baseURL: process.env.BASE_URL,
 });
 
-export const get = async () => {
-  const res = await request.get();
+export const get = async (url) => {
+  try {
+    const res = await request.get(url);
+    return res.data;
+  } catch (error) {
+    return error.response
+  }
+ 
 };
 
 export const post = async (url, data, option) => {
