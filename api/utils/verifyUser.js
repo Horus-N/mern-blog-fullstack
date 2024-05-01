@@ -9,7 +9,7 @@ const verifyToken = (req, res, next) => {
     let token = req.headers.authorization.split(" ")[1];
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
       if (err) {
-        return next(errorHandler(401, "Unauthorized"));
+        return next(errorHandler(401, "You yet login!"));
       }
       req.user = user;
       req.userId = req.params.userId;

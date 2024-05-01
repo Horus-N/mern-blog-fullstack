@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 const userRouter = require("./routes/user.route");
 const authRouter = require("./routes/auth.route");
+const postRouter = require("./routes/post.route");
 const cookieParser = require("cookie-parser");
 const { errorHandler } = require("./utils/error");
 
@@ -21,6 +22,7 @@ mongoose.connect(process.env.MONGO).then(() => console.log("Connected!"));
 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/post",postRouter);
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
