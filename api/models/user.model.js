@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
     profilePicture:{
       type:String,
       default:"https://hocdohoacaptoc.com/storage/2022/02/avata-dep-nam-2.jpg",
+    },
+    isAdmin:{
+      type:Boolean,
+      default:false,
     }
   },
   { timestamps: true }

@@ -1,5 +1,6 @@
 import { Alert, Button, Modal, TextInput } from "flowbite-react";
 import React, { useEffect, useState, useRef } from "react";
+import {Link} from 'react-router-dom'
 import {
   getDownloadURL,
   ref,
@@ -23,7 +24,7 @@ import { HiOutlineExclamationCircle } from "react-icons/hi";
 import * as request from "../service/axios";
 
 function DashProfile() {
-  const { currentUser, error } = useSelector((state) => state.user);
+  const { currentUser, error ,loading} = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const filePickerRef = useRef();
@@ -130,9 +131,12 @@ function DashProfile() {
         currentUser.token
       );
       if (res.status === 401) {
+        console.log('hello');
         dispatch(updateFailure(res.data.message));
         setUpdateUserError(res.data.message);
       } else {
+        console.log('hello2');
+
         dispatch(
           updateSuccess({
             ...res.message.user,
@@ -257,10 +261,19 @@ function DashProfile() {
           onChange={handleOnchange}
         />
 
-        <Button type="submit" gradientDuoTone="purpleToBlue" outline>
-          Update
+        <Button type="submit" gradientDuoTone="purpleToBlue" outline disabled={loading||imageFileUploading}>
+          {loading?'loading...': 'Update'}
         </Button>
       </form>
+      {
+        currentUser.isAdmin&&(
+          <Link to={'/create-post'}>
+          <Button type="button" gradientDuoTone='purpleToPink' className="w-full mt-5">
+            Create a post
+          </Button>
+          </Link>
+        )
+      }
       <div className="text-red-500 flex justify-between mt-5">
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
           Delete Account

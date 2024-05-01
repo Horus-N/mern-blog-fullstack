@@ -19,7 +19,7 @@ const signup = async (req, res, next) => {
     const hashedPassword = bcryptjs.hashSync(password, 10);
     const newUSer = new User({ ...req.body, password: hashedPassword });
     await newUSer.save();
-    return res.json({ message: "Đăng kí tai khoan thanh cong!" });
+    return res.json({ message: "Đăng kí tai khoan thanh cong!" ,newUSer});
   } catch (error) {
     next(error);
   }
