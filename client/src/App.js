@@ -1,6 +1,6 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import "./index.css";
-import { Home, About, SignIn, SignUp, Dashboard, Projects, CreatePost } from "./pages";
+import { Home, About, SignIn, SignUp, Dashboard, Projects, CreatePost, UpdatePost } from "./pages";
 import { Header, FooterCom,OnlyAdminPrivateroute } from "./components";
 import Privateroute from "./components/Privateroute";
 
@@ -18,6 +18,7 @@ function App() {
           </Route>
           <Route element={<OnlyAdminPrivateroute />}>
             <Route path="/create-post" element={<CreatePost />} />
+            <Route path="/update-post/:postId" element={<UpdatePost/>} />
           </Route>
           <Route path="/projects" element={<Projects />} />
         </Route>

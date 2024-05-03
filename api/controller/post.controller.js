@@ -91,4 +91,38 @@ const deletePost = async(req,res,next)=>{
  }
 }
 
-module.exports = { create, getPosts,deletePost };
+const updatePost = async(req,res,next)=>{
+  const userAdmin = await User.findOne({_id:req.user.id});
+  if(!userAdmin.isAdmin||req.user.id!== req.userId){
+   return next(errorHandler(403,'You are not allowed to update this post'));
+  }
+  try {
+    let slug = null;
+    if(req.body.title){
+       slug = req.body.title
+      .split(" ")
+      .join("-")
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9]/g, "-");
+    }
+   const updatedPost= await Post.findByIdAndUpdate(req.params.postId,{
+    $set:{
+      title:req.body.title,
+      content:req.body.content,
+      category:req.body.category,
+      image:req.body.image,
+      slug
+    }
+   },{
+    new:true
+   });
+   res.status(200).json({
+     'success':true,
+     updatedPost
+     });
+  } catch (error) {
+   next(error)
+  }
+}
+
+module.exports = { create, getPosts,deletePost,updatePost };
