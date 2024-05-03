@@ -158,7 +158,6 @@ function DashProfile() {
       dispatch(deleteUserStart());
       const res = await request.deleteUser(
         `http://localhost:5000/api/user/delete/${currentUser._id}`,
-        null,
         currentUser.token
       );
       if (res.success === false) {
@@ -174,8 +173,8 @@ function DashProfile() {
   const handleSignout = async () => {
     try {
       const res = await request.signout(
-        `http://localhost:5000/api/user/delete/${
-          (currentUser._id, null, currentUser.token)
+        `http://localhost:5000/api/user/signout//${
+          (currentUser._id, currentUser.token)
         }`
       );
 

@@ -2,9 +2,7 @@ const jwt = require("jsonwebtoken");
 const { errorHandler } = require("./error");
 
 const verifyToken = (req, res, next) => {
-  console.log(req.params.userId);
-  console.log(req.headers.authorization);
-
+  console.log(req.headers);
   if (req.headers.authorization) {
     let token = req.headers.authorization.split(" ")[1];
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {

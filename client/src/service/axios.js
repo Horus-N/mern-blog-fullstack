@@ -36,12 +36,25 @@ export const put = async (url, data, token) => {
   }
 };
 
-export const deleteUser = async (url, data=null, token) => {
+export const deletePost = async (url,token) => {
+  console.log(token);
   const config = {
     headers: { Authorization: `bearer ${token}` },
   };
   try {
-    const res = await request.delete(url, data, config);
+    const res = await request.delete(url,config);
+    return res.data;
+  } catch (error) {
+    return error.response
+  }
+};
+
+export const deleteUser = async (url, token) => {
+  const config = {
+    headers: { Authorization: `bearer ${token}` },
+  };
+  try {
+    const res = await request.delete(url, config);
     return res.data;
   } catch (error) {
     return error.response
@@ -50,12 +63,13 @@ export const deleteUser = async (url, data=null, token) => {
 
 
 
-export const signout = async (url, data=null, token) => {
+export const signout = async (url, token) => {
+  console.log(token);
   const config = {
     headers: { Authorization: `bearer ${token}` },
   };
   try {
-    const res = await request.post(url, data, config);
+    const res = await request.post(url,null,config);
     return res.data;
   } catch (error) {
     return error.response

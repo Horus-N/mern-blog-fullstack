@@ -24,7 +24,7 @@ function DashSidebar() {
   const handleSignout = async () => {
     try {
       const res = await request.signout(
-        `http://localhost:5000/api/user/delete/${
+        `http://localhost:5000/api/user/signout/${
           (currentUser._id, null, currentUser.token)
         }`
       );

@@ -11,15 +11,14 @@ import * as request from '../service/axios'
 export default function Header() {
   const path = useLocation().pathname;
   const { currentUser } = useSelector((state) => state.user);
+  console.log(currentUser?.token);
   const {theme} = useSelector(state=>state.theme);
   const dispatch = useDispatch();
 
   const handleSignout = async () => {
     try {
       const res = await request.signout(
-        `http://localhost:5000/api/user/delete/${
-          (currentUser._id, null, currentUser.token)
-        }`
+        `http://localhost:5000/api/user/signout/${currentUser._id}`,currentUser?.token
       );
 
       if (res.success === false) {
