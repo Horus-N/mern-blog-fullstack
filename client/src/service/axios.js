@@ -14,6 +14,20 @@ export const get = async (url) => {
  
 };
 
+export const getUsers = async (url, token) => {
+  const config = {
+    headers: { Authorization: `bearer ${token}` },
+  };
+  try {
+    const res = await request.get(url, config);
+    return res.data;
+  } catch (error) {
+    return error.response
+  }
+};
+
+
+
 export const post = async (url, data, option) => {
     try {
         
