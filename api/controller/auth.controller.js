@@ -19,7 +19,7 @@ const signup = async (req, res, next) => {
     const hashedPassword = bcryptjs.hashSync(password, 10);
     const newUSer = new User({ ...req.body, password: hashedPassword });
     await newUSer.save();
-    return res.json({ message: "Đăng kí tai khoan thanh cong!" ,newUSer});
+    return res.json({ message: "Đăng kí tai khoan thanh cong!", newUSer });
   } catch (error) {
     next(error);
   }
@@ -45,12 +45,18 @@ const signin = async (req, res) => {
     );
     if (checkPassword) {
       const users = { ...findOne._doc };
-      const token = jwt.sign({ id: findOne._id }, process.env.JWT_SECRET,{expiresIn: '1d'});
-      const refreshToken = jwt.sign({ id: findOne._id }, process.env.JWT_SECRET,{expiresIn: '1y'});
+      const token = jwt.sign({ id: findOne._id }, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
+      const refreshToken = jwt.sign(
+        { id: findOne._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1y" }
+      );
       delete users.password;
       return res.status(200).cookie("access_token", token).json({
-        token:token,
-        refreshToken:refreshToken,
+        token: token,
+        refreshToken: refreshToken,
         success: true,
         message: "Đăng nhập thành công!",
         user: users,
@@ -61,6 +67,31 @@ const signin = async (req, res) => {
         message: "Tài khoản hoặc mật khẩu không chính xác!",
       });
     }
+  }
+};
+
+const refreshToken = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ _id: req.user.id });
+    if (!user) {
+      next(errorHandler(400, "Login again!"));
+    }
+    const { password, ...rest } = user._doc;
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1y",
+    });
+    return res.status(200).cookie("access_token", token).json({
+      token: token,
+      refreshToken: refreshToken,
+      success: true,
+      message: "Đăng nhập thành công!",
+      user: rest,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -114,6 +145,4 @@ const google = async (req, res) => {
   }
 };
 
-
-
-module.exports = { signup, signin, google };
+module.exports = { signup, signin, google,refreshToken };

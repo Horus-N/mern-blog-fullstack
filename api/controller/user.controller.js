@@ -98,6 +98,29 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+const deleteUsers = async (req, res, next) => {
+  const userAdmin = await User.findOne({ _id: req.user.id });
+  if (!userAdmin && !userAdmin.isAdmin) {
+    return next(errorHandler(403, "your are not allowed to delete this user"));
+  }
+  try {
+    const user = await User.findById(req.userId);
+    if (user) {
+      await User.findByIdAndDelete(req.userId);
+      return res
+        .status(200)
+        .json({ success: true, message: "User has been deleted" });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "This user does not exist!",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 const signout = async (req, res, next) => {
   if (req.user.id !== req.userId) {
     return next(errorHandler(403, "your are not allowed to signout this user"));
@@ -116,47 +139,47 @@ const signout = async (req, res, next) => {
   } catch (error) {}
 };
 
-const getUsers= async(req,res,next)=>{
-  const userAdmin = await User.findOne({_id:req.user.id});
-  if(!userAdmin.isAdmin){
-   return next(errorHandler(403,'You are not allowed to see this users'));
+const getUsers = async (req, res, next) => {
+  const userAdmin = await User.findOne({ _id: req.user.id });
+  if (!userAdmin.isAdmin) {
+    return next(errorHandler(403, "You are not allowed to see this users"));
   }
-try {
-  const startIndex = parseInt(req.query.startIndex)||0;
-  const limit = parseInt(req.query.limit)||9;
-  const sortDirection = req.query.sort ==='asc' ? 1:-1;
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.sort === "asc" ? 1 : -1;
 
-  const users = await User.find()
-  .sort({createdAt:sortDirection})
-  .skip(startIndex)
-  .limit(limit);
+    const users = await User.find()
+      .sort({ createdAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
 
-  const usersWithoutPassword = users.map((user)=>{
-    const {password,...rest}  = user._doc;
-    return rest;
-  })
+    const usersWithoutPassword = users.map((user) => {
+      const { password, ...rest } = user._doc;
+      return rest;
+    });
 
-  const totalUsers = await User.countDocuments();
-  const now = new Date();
+    const totalUsers = await User.countDocuments();
+    const now = new Date();
 
-  const oneMonthAgo = new Date (
-    now.getFullYear(),
-    now.getMonth()-1,
-    now.getDate()
-  )
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
 
-  const lastMonthUser = await User.countDocuments({
-    createdAt:{$gte:oneMonthAgo}
-  })
+    const lastMonthUser = await User.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
+    });
 
-  res.status(200).json({
-    users:usersWithoutPassword,
-    totalUsers,
-    lastMonthUser,
-    success:true
-  })
-} catch (error) {
- next(error) 
-}
-}
-module.exports = { updateUser, deleteUser, signout,getUsers};
+    res.status(200).json({
+      users: usersWithoutPassword,
+      totalUsers,
+      lastMonthUser,
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = { updateUser, deleteUser, signout, getUsers, deleteUsers };

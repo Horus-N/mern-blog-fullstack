@@ -11,7 +11,6 @@ import * as request from '../service/axios'
 export default function Header() {
   const path = useLocation().pathname;
   const { currentUser } = useSelector((state) => state.user);
-  console.log(currentUser?.token);
   const {theme} = useSelector(state=>state.theme);
   const dispatch = useDispatch();
 

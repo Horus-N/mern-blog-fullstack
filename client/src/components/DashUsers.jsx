@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector} from "react-redux";
 import * as request from "../service/axios";
 import { Table,Modal,Button} from "flowbite-react";
 import { Link } from "react-router-dom";
@@ -11,7 +11,7 @@ function DashUsers() {
   const [users, setUsers] = useState([]);
   const [showMore, setShowMore]  = useState(true);
   const [showModal, setShowModal]  = useState(false);
-  const [usersIdToDelete,setUsersIdToDelete] = useState('')
+  const [usersIdToDelete,setUsersIdToDelete] = useState('');
 
   useEffect(() => {
     const apiUsers = async () => {
@@ -53,12 +53,13 @@ function DashUsers() {
     }
   }
 
-  const handleDeleteUsers = async (userId)=>{
+  const handleDeleteUsers = async ()=>{
     setShowModal(false);
     try {
-      const res = await request.deleteUser(`http://localhost:5000/api/user/delete/${userId}`,currentUser.token);
+      const res = await request.deleteUser(`http://localhost:5000/api/user/delete-users/${usersIdToDelete}`,currentUser.token);
       if(res.success){
-        setUsers((prev)=>prev.filter((user)=>user._id!==usersIdToDelete))
+        setUsers((prev)=>prev.filter((user)=>user._id!==usersIdToDelete));
+        setShowModal(false);
       }else{
         console.log(res);
       }
@@ -153,7 +154,7 @@ function DashUsers() {
               Are you sure you want to delete this user?
             </h3>
             <div className="flex justify-center gap-4">
-              <Button color="failure" onClick={()=>handleDeleteUsers}>
+              <Button color="failure" onClick={handleDeleteUsers}>
                 Yes, I'm sure
               </Button>
               <Button color="gray" onClick={() => setShowModal(false)}>
