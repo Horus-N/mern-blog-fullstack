@@ -6,9 +6,9 @@ const request = axios.create({
 });
 
 export const createRefresh = async (user, dispatch, signInSuccess) => {
+  console.log(user);
   try {
     const date = new Date();
-
     const decodedToken = await jwtDecode(user?.token);
     if (decodedToken.exp < date.getTime() / 1000) {
       const res = await refresh(user?.refreshToken);
@@ -106,6 +106,18 @@ export const signout = async (url, token) => {
   };
   try {
     const res = await request.post(url, null, config);
+    return res.data;
+  } catch (error) {
+    return error.response;
+  }
+};
+
+export const createComment = async (url, data, token) => {
+  const config = {
+    headers: { Authorization: `bearer ${token}` },
+  };
+  try {
+    const res = await request.post(url, data, config);
     return res.data;
   } catch (error) {
     return error.response;

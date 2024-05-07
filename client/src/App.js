@@ -11,12 +11,13 @@ import {
   UpdatePost,
   PostPage,
 } from "./pages";
-import { Header, FooterCom, OnlyAdminPrivateroute } from "./components";
+import { Header, FooterCom, OnlyAdminPrivateroute, ScrollToTop } from "./components";
 import Privateroute from "./components/Privateroute";
 
 function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop/>
       <Routes>
         <Route path="/" element={<Header />}>
           <Route index element={<Home />} />

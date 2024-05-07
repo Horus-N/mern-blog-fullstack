@@ -13,11 +13,11 @@ export default function Dashboard() {
   const [tab, setTab] = useState("");
 
   const { currentUser } = useSelector((state) => state.user);
-  console.log(currentUser);
   const dispatch = useDispatch();
-
-  request.createRefresh(currentUser, dispatch, signInSuccess);
-
+  const refreshToken =  async()=>{
+    await request.createRefresh(currentUser, dispatch, signInSuccess);
+  }
+  refreshToken();
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get("tab");

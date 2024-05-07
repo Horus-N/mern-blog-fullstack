@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { get } from "../service/axios";
 import { Button, Spinner } from "flowbite-react";
-import { CallToAction } from "../components";
+import { CallToAction, CommentSection } from "../components";
 
 function PostPage() {
   const { postSlug } = useParams();
@@ -32,7 +32,7 @@ function PostPage() {
       }
     };
     fetchPost();
-  }, postSlug);
+  }, [postSlug]);
 
   if (loading)
     return (
@@ -44,7 +44,6 @@ function PostPage() {
         <Spinner size="xl" />{" "}
       </div>
     );
-  console.log(post?.content.length);
   return (
     <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
@@ -79,6 +78,7 @@ function PostPage() {
       <div className="max-w-4xl mx-auto w-full">
         <CallToAction/>
       </div>
+    <CommentSection postId = {post._id}/>
     </main>
   );
 }
