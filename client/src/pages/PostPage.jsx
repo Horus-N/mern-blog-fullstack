@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { get } from "../service/axios";
 import { Button, Spinner } from "flowbite-react";
-import { CallToAction, CommentSection } from "../components";
-
+import { CallToAction, CommentSection, PostCard } from "../components";
 function PostPage() {
   const { postSlug } = useParams();
   const [post, setPost] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
+  const [recentPosts, setRecentPosts] = useState([]);
   useEffect(() => {
     const fetchPost = async () => {
       setLoading(true);
@@ -34,13 +34,28 @@ function PostPage() {
     fetchPost();
   }, [postSlug]);
 
+  useEffect(() => {
+    try {
+      const fetchRecentPosts = async () => {
+        const res = await get(
+          `http://localhost:5000/api/post/getposts?limit=3`
+        );
+        if (res.success) {
+          setRecentPosts(res.posts);
+        }
+      };
+      fetchRecentPosts();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   if (loading)
     return (
       <div
         className="flex justify-center items-center
     min-h-screen"
       >
-        {" "}
         <Spinner size="xl" />{" "}
       </div>
     );
@@ -76,9 +91,17 @@ function PostPage() {
         dangerouslySetInnerHTML={{ __html: post && post.content }}
       ></div>
       <div className="max-w-4xl mx-auto w-full">
-        <CallToAction/>
+        <CallToAction />
       </div>
-    <CommentSection postId = {post._id}/>
+      <CommentSection postId={post._id} />
+
+      <div className="flex flex-col justify-center items-center mb-5">
+        <h1 className="text-xl mt-5">Recent articles</h1>
+        <div className="flex flex-wrap gap-5 mt-5 justify-center">
+          {recentPosts &&
+            recentPosts.map((post) => <PostCard key={post._id} post={post} />)}
+        </div>
+      </div>
     </main>
   );
 }
