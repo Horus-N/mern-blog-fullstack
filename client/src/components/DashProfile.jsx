@@ -1,6 +1,6 @@
 import { Alert, Button, Modal, TextInput } from "flowbite-react";
 import React, { useEffect, useState, useRef } from "react";
-import {Link} from 'react-router-dom'
+import { Link } from "react-router-dom";
 import {
   getDownloadURL,
   ref,
@@ -17,14 +17,14 @@ import {
   deleteUserFailure,
   deleteUserStart,
   deleteUserSuccess,
-  signoutSuccess
+  signoutSuccess,
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import * as request from "../service/axios";
 
 function DashProfile() {
-  const { currentUser, error ,loading} = useSelector((state) => state.user);
+  const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const filePickerRef = useRef();
@@ -131,11 +131,11 @@ function DashProfile() {
         currentUser.token
       );
       if (res.status === 401) {
-        console.log('hello');
+        console.log("hello");
         dispatch(updateFailure(res.data.message));
         setUpdateUserError(res.data.message);
       } else {
-        console.log('hello2');
+        console.log("hello2");
 
         dispatch(
           updateSuccess({
@@ -156,7 +156,7 @@ function DashProfile() {
     setShowModal(false);
     try {
       dispatch(deleteUserStart());
-      const res = await request.deleteUser(
+      const res = await request.createDelete(
         `http://localhost:5000/api/user/delete/${currentUser._id}`,
         currentUser.token
       );
@@ -260,19 +260,26 @@ function DashProfile() {
           onChange={handleOnchange}
         />
 
-        <Button type="submit" gradientDuoTone="purpleToBlue" outline disabled={loading||imageFileUploading}>
-          {loading?'loading...': 'Update'}
+        <Button
+          type="submit"
+          gradientDuoTone="purpleToBlue"
+          outline
+          disabled={loading || imageFileUploading}
+        >
+          {loading ? "loading..." : "Update"}
         </Button>
       </form>
-      {
-        currentUser.isAdmin&&(
-          <Link to={'/create-post'}>
-          <Button type="button" gradientDuoTone='purpleToPink' className="w-full mt-5">
+      {currentUser.isAdmin && (
+        <Link to={"/create-post"}>
+          <Button
+            type="button"
+            gradientDuoTone="purpleToPink"
+            className="w-full mt-5"
+          >
             Create a post
           </Button>
-          </Link>
-        )
-      }
+        </Link>
+      )}
       <div className="text-red-500 flex justify-between mt-5">
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
           Delete Account

@@ -6,10 +6,10 @@ import { FaThumbsUp } from "react-icons/fa";
 import { Button, Textarea } from "flowbite-react";
 import { put } from "../service/axios";
 
-function Comment({ comment, onLike, onEdit }) {
+function Comment({ comment, onLike, onEdit, onDelete }) {
   const [user, setUser] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
-  const [editContent,setEditContent]= useState('');
+  const [editContent, setEditContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const refCurrent = useRef(null);
   useEffect(() => {
@@ -26,7 +26,7 @@ function Comment({ comment, onLike, onEdit }) {
 
   const handleEdit = async () => {
     setIsEditing(true);
-    if(refCurrent.current!==null){
+    if (refCurrent.current !== null) {
       refCurrent.current.focus();
     }
   };
@@ -35,20 +35,22 @@ function Comment({ comment, onLike, onEdit }) {
     if (isEditing && refCurrent.current !== null) {
       handleEdit();
     }
-  }, [isEditing]); 
+  }, [isEditing]);
 
-  const handleSave = async ()=>{
+  const handleSave = async () => {
     try {
-      const res = await put(`http://localhost:5000/api/comment/updateComment/${comment._id}`,{content:editContent},currentUser.token);
-      if(res.success){
+      const res = await put(
+        `http://localhost:5000/api/comment/updateComment/${comment._id}`,
+        { content: editContent },
+        currentUser.token
+      );
+      if (res.success) {
         setIsEditing(false);
-        onEdit(comment._id,editContent);
-        setEditContent('');
+        onEdit(comment._id, editContent);
+        setEditContent("");
       }
-    } catch (error) {
-      
-    }
-  }
+    } catch (error) {}
+  };
   return (
     <div className="flex p-4 border-b dark:border-gray-600 text-sm">
       <div className="flex-shrink-0 mr-3">
@@ -70,22 +72,33 @@ function Comment({ comment, onLike, onEdit }) {
         </div>
         {isEditing ? (
           <>
-          <Textarea
-          ref={refCurrent}
-          className="mb-2"
-            placeholder="Edit a comment..."
-            onChange={(e) =>setEditContent(e.target.value)}
-            value={editContent}
-          />
-          
-          <div className="flex justify-end gap-2 text-xs">
-            <Button onClick={handleSave} type="button" size={'sm'} gradientDuoTone={'purpleToBlue'}>
-              Save
-            </Button>
-            <Button onClick={()=>setIsEditing(false)} type="button" size={'sm'} gradientDuoTone={'purpleToBlue'} outline>
-              Cancel
-            </Button>
-          </div>
+            <Textarea
+              ref={refCurrent}
+              className="mb-2"
+              placeholder="Edit a comment..."
+              onChange={(e) => setEditContent(e.target.value)}
+              value={editContent}
+            />
+
+            <div className="flex justify-end gap-2 text-xs">
+              <Button
+                onClick={handleSave}
+                type="button"
+                size={"sm"}
+                gradientDuoTone={"purpleToBlue"}
+              >
+                Save
+              </Button>
+              <Button
+                onClick={() => setIsEditing(false)}
+                type="button"
+                size={"sm"}
+                gradientDuoTone={"purpleToBlue"}
+                outline
+              >
+                Cancel
+              </Button>
+            </div>
           </>
         ) : (
           <>
@@ -111,14 +124,22 @@ function Comment({ comment, onLike, onEdit }) {
               </p>
               {currentUser &&
                 (currentUser._id === comment.userId || currentUser.isAdmin) && (
-                  <button
-                    onClick={handleEdit}
-                    className="text-gray-400 hover:text-blue-500"
-                    type="edit"
-                  >
-                    {" "}
-                    Edit
-                  </button>
+                  <>
+                    <button
+                      onClick={handleEdit}
+                      className="text-gray-400 hover:text-blue-500"
+                      type="edit"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => onDelete(comment._id)}
+                      className="text-gray-400 hover:text-blue-500"
+                      type="delete"
+                    >
+                      Delete
+                    </button>
+                  </>
                 )}
             </div>
           </>

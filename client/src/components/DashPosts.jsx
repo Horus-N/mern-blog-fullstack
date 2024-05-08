@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as request from "../service/axios";
-import { Table,Modal,Button} from "flowbite-react";
+import { Table, Modal, Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 function DashPosts() {
   const { currentUser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
-  const [showMore, setShowMore]  = useState(true);
-  const [showModal, setShowModal]  = useState(false);
-  const [postIdToDelete,setPostIdToDelete] = useState('')
+  const [showMore, setShowMore] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [postIdToDelete, setPostIdToDelete] = useState("");
 
   useEffect(() => {
     const apiPosts = async () => {
@@ -20,9 +20,8 @@ function DashPosts() {
         );
         if (res.success === true) {
           setUserPosts(res.posts);
-          if(res.posts.length<9){
+          if (res.posts.length < 9) {
             setShowMore(false);
-
           }
         }
       } catch (error) {
@@ -35,42 +34,48 @@ function DashPosts() {
     }
   }, [currentUser._id]);
 
-  const handleShowMore= async()=>{
+  const handleShowMore = async () => {
     const startIndex = userPosts.length;
     const res = await request.get(
       `http://localhost:5000/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
     );
-    if(res.success){
-      setUserPosts((prev)=>[...prev,...res.posts]);
-      if(res.posts.length<9){
+    if (res.success) {
+      setUserPosts((prev) => [...prev, ...res.posts]);
+      if (res.posts.length < 9) {
         setShowMore(false);
       }
     }
     try {
-      
     } catch (error) {
       console.log(error.message);
     }
-  }
+  };
 
-  const handleDeletePost = async ()=>{
+  const handleDeletePost = async () => {
     setShowModal(false);
     try {
-      const res = await request.deletePost(`http://localhost:5000/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,currentUser.token);
-      if(res.success){
-        setUserPosts((prev)=>prev.filter((post)=>post._id!==postIdToDelete))
-      }else{
+      const res = await request.createDelete(
+        `http://localhost:5000/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
+        currentUser.token
+      );
+      if (res.success) {
+        setUserPosts((prev) =>
+          prev.filter((post) => post._id !== postIdToDelete)
+        );
+      } else {
         console.log(res);
       }
     } catch (error) {
       console.log(error.message);
     }
-  }
+  };
   return (
-    <div className="table-auto overflow-x-scroll
+    <div
+      className="table-auto overflow-x-scroll
      md:mx-auto p-3 scrollbar scrollbar-track-slate-100
      scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700
-     dark:scrollbar-thumb-slate-300">
+     dark:scrollbar-thumb-slate-300"
+    >
       {currentUser.isAdmin && userPosts.length > 0 ? (
         <>
           <Table hoverable className="shadow-md">
@@ -112,8 +117,13 @@ function DashPosts() {
 
                   <Table.Cell>{post.category}</Table.Cell>
                   <Table.Cell>
-                    <span onClick={()=>{setShowModal(true);
-                    setPostIdToDelete(post._id)}} className="font-medium text-red-500 hover:underline hover:cursor-pointer">
+                    <span
+                      onClick={() => {
+                        setShowModal(true);
+                        setPostIdToDelete(post._id);
+                      }}
+                      className="font-medium text-red-500 hover:underline hover:cursor-pointer"
+                    >
                       Delete
                     </span>
                   </Table.Cell>
@@ -130,19 +140,20 @@ function DashPosts() {
               </Table.Body>
             ))}
           </Table>
-          {
-            showMore && (
-              <button onClick={handleShowMore} className="w-full text-teal-500 self-center text-sm py-7">
-                Show more
-              </button>
-            )
-          }
+          {showMore && (
+            <button
+              onClick={handleShowMore}
+              className="w-full text-teal-500 self-center text-sm py-7"
+            >
+              Show more
+            </button>
+          )}
         </>
       ) : (
         <p>You have no post yet !</p>
       )}
 
-<Modal
+      <Modal
         show={showModal}
         onClose={() => setShowModal(false)}
         popup
