@@ -1,16 +1,18 @@
 import { Alert, Button, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { createComment } from "../service/axios";
+import { Link, useNavigate } from "react-router-dom";
+import { createComment, put } from "../service/axios";
 import { get } from "../service/axios";
-import {Comment} from '../components'
+import { Comment } from "../components";
 
 function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [commentError, setCommentError] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,9 +34,9 @@ function CommentSection({ postId }) {
     if (res?.success) {
       setComment("");
       setCommentError(null);
-      setComments([...comments,res.newComment]);
+      setComments([...comments, res.newComment]);
     }
-    if (res?.data?.success==='false') {
+    if (res?.data?.success === "false") {
       setCommentError(res.data.message);
     }
   };
@@ -50,6 +52,43 @@ function CommentSection({ postId }) {
     };
     getComments();
   }, [postId]);
+
+  const handleLike = async (commentId) => {
+    try {
+      if (!currentUser) {
+        navigate("/sign-in");
+        return;
+      }
+      const res = await put(
+        `http://localhost:5000/api/comment/likeComment/${commentId}`,
+        null,
+        currentUser.token
+      );
+      if (res.success) {
+        setComments(
+          comments.map((comment) => {
+           return comment._id === commentId
+              ? {
+                  ...comment,
+                  likes: res.message.likes,
+                  numberOfLikes: res.message.likes.length,
+                }
+              : comment;
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleEdit = async (commentId,editedContent)=>{
+    setComments(
+      comments.map((c)=>{
+        return c._id===commentId?{...c,content:editedContent}:c
+      })
+    )
+  }
   return (
     <div className="max-w-2xl mx-auto w-full">
       {currentUser ? (
@@ -115,10 +154,8 @@ function CommentSection({ postId }) {
             </div>
           </div>
 
-          {comments.map(cmt=>(
-            <Comment
-            key={cmt._id} comment={cmt} 
-            />
+          {comments.map((cmt) => (
+            <Comment key={cmt._id} comment={cmt} onLike={handleLike} onEdit = {handleEdit} />
           ))}
         </>
       )}
