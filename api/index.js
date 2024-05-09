@@ -23,7 +23,6 @@ dotenv.config();
 mongoose.set("strictQuery", true);
 mongoose.connect(process.env.MONGO).then(() => console.log("Connected!"));
 
-const __dirname = path.resolve();
 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);

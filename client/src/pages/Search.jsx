@@ -38,7 +38,7 @@ function Search() {
       const res = await get(
         `http://localhost:5000/api/post/getposts?${searchQuery}`
       );
-      if (res.success) {
+      if (res?.success) {
         setPosts(res.posts);
         setLoading(false);
 
