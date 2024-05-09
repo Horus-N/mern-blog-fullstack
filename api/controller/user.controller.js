@@ -168,14 +168,14 @@ const getUsers = async (req, res, next) => {
       now.getDate()
     );
 
-    const lastMonthUser = await User.countDocuments({
+    const lastMonthUsers = await User.countDocuments({
       createdAt: { $gte: oneMonthAgo },
     });
 
     res.status(200).json({
       users: usersWithoutPassword,
       totalUsers,
-      lastMonthUser,
+      lastMonthUsers,
       success: true,
     });
   } catch (error) {
@@ -183,19 +183,26 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-const getUser = async (req,res,next)=>{
+const getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
-    if(!user){
-      return next(errorHandler(404,'User not found'));
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
     }
-    const {password,...rest} = user._doc;
+    const { password, ...rest } = user._doc;
     res.status(200).json({
-      success:true,
-      rest
-    })
+      success: true,
+      rest,
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
-module.exports = { updateUser, deleteUser,getUser, signout, getUsers, deleteUsers };
+};
+module.exports = {
+  updateUser,
+  deleteUser,
+  getUser,
+  signout,
+  getUsers,
+  deleteUsers,
+};

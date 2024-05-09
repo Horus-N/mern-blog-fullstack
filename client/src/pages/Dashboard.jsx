@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { DashComments, DashProfile, DashSidebar } from "../components";
+import {
+  DashComments,
+  DashProfile,
+  DashSidebar,
+  DashboardComp,
+} from "../components";
 import DashPosts from "../components/DashPosts";
 import DashUsers from "../components/DashUsers";
 import { signInSuccess } from "../redux/user/userSlice";
@@ -31,20 +36,16 @@ export default function Dashboard() {
         {/* sidebar */}
         <DashSidebar />
       </div>
-
       {/* profile */}
       {tab === "profile" && <DashProfile />}
-
       {/* posts */}
       {tab === "posts" && <DashPosts />}
-
       {/* users */}
-
       {tab === "users" && <DashUsers />}
-
       {/* comment */}
-
       {tab === "comments" && <DashComments />}
+      {/* dashboard comp */}
+      {tab === "dash" && <DashboardComp />}
     </div>
   );
 }
