@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { DashProfile, DashSidebar } from "../components";
+import { DashComments, DashProfile, DashSidebar } from "../components";
 import DashPosts from "../components/DashPosts";
 import DashUsers from "../components/DashUsers";
 import { signInSuccess } from "../redux/user/userSlice";
@@ -14,9 +14,9 @@ export default function Dashboard() {
 
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const refreshToken =  async()=>{
+  const refreshToken = async () => {
     await request.createRefresh(currentUser, dispatch, signInSuccess);
-  }
+  };
   refreshToken();
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -41,6 +41,10 @@ export default function Dashboard() {
       {/* users */}
 
       {tab === "users" && <DashUsers />}
+
+      {/* comment */}
+
+      {tab === "comments" && <DashComments />}
     </div>
   );
 }
