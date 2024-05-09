@@ -7,6 +7,17 @@ import SignIn from "./SignIn";
 import CreatePost from "./CreatePost";
 import UpdatePost from "./UpdatePost";
 import PostPage from "./PostPage";
+import Search from "./Search";
 
-
-export {Home,Projects,SignIn,SignUp,Dashboard,About,CreatePost,UpdatePost,PostPage}
+export {
+  Home,
+  Search,
+  Projects,
+  SignIn,
+  SignUp,
+  Dashboard,
+  About,
+  CreatePost,
+  UpdatePost,
+  PostPage,
+};

@@ -1,23 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navbar, TextInput, Button, Dropdown, Avatar } from "flowbite-react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon,FaSun } from "react-icons/fa";
+import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { signoutSuccess } from "../redux/user/userSlice";
-import * as request from '../service/axios'
+import * as request from "../service/axios";
 
 export default function Header() {
   const path = useLocation().pathname;
+  const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser } = useSelector((state) => state.user);
-  const {theme} = useSelector(state=>state.theme);
+  const { theme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
+  const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const searchTermFromUrl = urlParams.get("searchTerm");
+    if (searchTermFromUrl) {
+      setSearchTerm(searchTermFromUrl);
+    }
+  }, [location.search]);
 
   const handleSignout = async () => {
     try {
       const res = await request.signout(
-        `http://localhost:5000/api/user/signout/${currentUser._id}`,currentUser?.token
+        `http://localhost:5000/api/user/signout/${currentUser._id}`,
+        currentUser?.token
       );
 
       if (res.success === false) {
@@ -28,6 +39,14 @@ export default function Header() {
     } catch (error) {
       console.log(error.message);
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("searchTerm", searchTerm);
+    const searchQuery = urlParams.toString();
+    navigate(`/search?${searchQuery}`);
   };
   return (
     <>
@@ -45,16 +64,19 @@ export default function Header() {
           Blog
         </Link>
 
-        <form action="">
+        <form onSubmit={handleSubmit}>
           <TextInput
             type="text"
             placeholder="Search..."
             rightIcon={AiOutlineSearch}
-            className="hidden lg:inline"
+            className="hidden lg:inline z-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onClick={handleSubmit}
           ></TextInput>
         </form>
 
-        <Button className="w-12 h-19 lg:hidden" color="gray" pill>
+        <Button type="submit" className="w-12 h-19 lg:hidden" color="gray" pill>
           <AiOutlineSearch />
         </Button>
 
@@ -65,12 +87,7 @@ export default function Header() {
             pill
             onClick={() => dispatch(toggleTheme())}
           >
-            {theme ==='light'?(
-              <FaMoon />
-            ):(
-              <FaSun/>
-            )}
-            
+            {theme === "light" ? <FaMoon /> : <FaSun />}
           </Button>
           {currentUser ? (
             <Dropdown

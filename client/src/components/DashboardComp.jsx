@@ -22,6 +22,9 @@ function DashboardComp() {
   const [lastMonthComments, setLastMonthComments] = useState(0);
   const { currentUser } = useSelector((state) => state.user);
 
+  if (posts) {
+    console.log(posts[0]?.image);
+  }
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -151,7 +154,7 @@ function DashboardComp() {
                   <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
                     <Table.Cell>
                       <img
-                        src="{user.profilePicture}"
+                        src={user.profilePicture}
                         alt="user"
                         className="w-10 h-10 rounded-full bg-gray-500"
                       />
@@ -214,7 +217,7 @@ function DashboardComp() {
                   <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
                     <Table.Cell>
                       <img
-                        src="{post.image}"
+                        src={post.image}
                         alt="post"
                         className="w-14 h-10 rounded-md bg-gray-500"
                       />
